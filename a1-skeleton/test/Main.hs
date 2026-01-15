@@ -49,7 +49,13 @@ numericTests =
         "taylor"
         [ testCase "2nd-degree Taylor approximation of (3x+2) at 3 (with step size 2)" do
             taylor 2 2 (eval ((Const 3 `Mul` X) `Add` Const 2)) 3
-              @?= Add (Add (Const 11) (Mul (Pow X 1) (Mul (Const 1) (Const 3)))) (Mul (Pow X 2) (Mul (Const (1 / 2)) (Const 0)))
+              @?= Add (Add (Const 11) (Mul (Mul (Pow X 1) (Const 1)) (Const 3 ))) (Mul (Mul (Pow X 2) (Const (1 / 2))) (Const 0))
+        ],
+      testGroup
+        "cstep"
+        [ testCase "sin'(x) = cos(x)" do
+            cstep (1 / 10 ^ 100) sin 1.3
+              @?= cos 1.3
         ]
     ]
 
@@ -59,29 +65,25 @@ automaticTests =
     "Automatic"
     [ testGroup
         "addDual"
-        [
-            testCase "(3, 2) + (2, 3)" do 
-                addDual (Dual 3 2) (Dual 2 3) 
-                    @?= Dual 5 5
+        [ testCase "(3, 2) + (2, 3)" do
+            addDual (Dual 3 2) (Dual 2 3)
+              @?= Dual 5 5
         ],
       -- Your tests here!
 
       testGroup
         "mulDual"
-        [
-            testCase "(3, 2) * (2, 3)" do 
-                mulDual (Dual 3 2) (Dual 2 3) 
-                    @?= Dual (3 * 2) ( 3 * 3 + 2 * 2)
+        [ testCase "(3, 2) * (2, 3)" do
+            mulDual (Dual 3 2) (Dual 2 3)
+              @?= Dual (3 * 2) (3 * 3 + 2 * 2)
         ],
       -- Your tests here!
 
       testGroup
         "powDual"
-        [
-            testCase "(3, 2)^2" do 
-                powDual (Dual 3 2) 2 
-                    @?= Dual (3^2) (2 * 3^1 * 2)
-
+        [ testCase "(3, 2)^2" do
+            powDual (Dual 3 2) 2
+              @?= Dual (3 ^ 2) (2 * 3 ^ 1 * 2)
         ]
     ]
 

@@ -3,11 +3,15 @@ module A1.Numeric
   ( delta
   , ntimes
   , taylor
+  , cstep
   ) where
 
 import A1.Polynomial
 
 import Numeric.Natural
+import Data.Complex (Complex (..), imagPart)
+import A1.Automatic (Dual (Dual))
+import GHC.Float (rationalToDouble)
 
 -- we just implemenet the fomula given in the document 
 -- | The finite difference operator @Δₕ(f)@.
@@ -38,6 +42,28 @@ taylor h n f a = taylor h (n - 1) f a --recusivly do the left side of the plus
                     ) 
                      
 
+
+
+--------------------------------------------------------------------------------
+-- B2 Complex-Step Diffrentiation 
+-- https://hackage-content.haskell.org/package/base-4.22.0.0/docs/Data-Complex.html
+-- for some reason the assignment specs says to accept x as a complex 
+-- and to return the complex while the link provided as source considers 
+-- x as a 
+cstep :: Double -> (Complex Double -> Complex Double) -> Complex Double -> Complex Double
+cstep h f (a :+ b) = let 
+    d = imagPart (f (a :+ h)) / h 
+    in 
+    d :+ 0
+
+fromDual :: Double -> Dual -> Complex Double 
+fromDual h (Dual a b) = fromRational a :+ fromRational b *h
+
+toDual :: Double -> Complex Double -> Dual 
+toDual h (a :+ b) = Dual (toRational a) (toRational (b / h))
+
+sinDual :: Double -> Dual -> Dual 
+sinDual h d = toDual h (sin (fromDual h d)) 
 --------------------------------------------------------------------------------
 -- Helper functions: you can use these in your solution.
 

@@ -39,7 +39,7 @@ NIX_BINTOOLS='/nix/store/iga4lv0say4pbbbgkf1v79403n1ip7hf-binutils-wrapper-2.44'
 export NIX_BINTOOLS
 NIX_BINTOOLS_WRAPPER_TARGET_HOST_x86_64_unknown_linux_gnu='1'
 export NIX_BINTOOLS_WRAPPER_TARGET_HOST_x86_64_unknown_linux_gnu
-NIX_BUILD_CORES='24'
+NIX_BUILD_CORES='16'
 export NIX_BUILD_CORES
 NIX_CC='/nix/store/kks0nbx2riwry5qsx0qr87qr0lswmhzi-gcc-wrapper-14.3.0'
 export NIX_CC
@@ -59,7 +59,7 @@ NIX_GHC_LIBDIR='/nix/store/xjsg1lm52b01v6k1v1169nlwpa2ing74-ghc-9.8.4/lib/ghc-9.
 export NIX_GHC_LIBDIR
 NIX_HARDENING_ENABLE='bindnow format pic relro stackclashprotection stackprotector strictoverflow zerocallusedregs'
 export NIX_HARDENING_ENABLE
-NIX_LDFLAGS='-rpath /home/nasir/stuff/projects/4fp3/outputs/out/lib  -L/nix/store/vj3rmg6937p9icir6bazbdcb4xdnrg9j-ncurses-6.5/lib -L/nix/store/0aaj6jbxclpwvrphggqz4vf5hg8360fr-libffi-3.4.8/lib -L/nix/store/vaix9m2syrilm7hv3690plsk35y0arwm-elfutils-0.192/lib -L/nix/store/m9fycbkaairz8kampnsl7sx1aanvl0db-gmp-with-cxx-6.3.0/lib -L/nix/store/cvd68krxqrwgrsigszs0al2i8dnvlwk4-libxcrypt-4.4.38/lib -L/nix/store/yrgnr4naqdjwdhn1q142f8c5yb8jsz37-file-5.45/lib -L/nix/store/jd20rkmqmkfkcvk2wl2lmzz7acq4svlr-python3-3.12.12/lib -L/nix/store/f2q5ld1nipl8w1r2w8m6azhlm2varqgb-zlib-1.3.1/lib -L/nix/store/87kd8nb5bws9x8r3k66hbcryr3xxvwxn-numactl-2.0.18/lib -L/nix/store/vj3rmg6937p9icir6bazbdcb4xdnrg9j-ncurses-6.5/lib -L/nix/store/0aaj6jbxclpwvrphggqz4vf5hg8360fr-libffi-3.4.8/lib -L/nix/store/vaix9m2syrilm7hv3690plsk35y0arwm-elfutils-0.192/lib -L/nix/store/m9fycbkaairz8kampnsl7sx1aanvl0db-gmp-with-cxx-6.3.0/lib -L/nix/store/cvd68krxqrwgrsigszs0al2i8dnvlwk4-libxcrypt-4.4.38/lib -L/nix/store/yrgnr4naqdjwdhn1q142f8c5yb8jsz37-file-5.45/lib -L/nix/store/jd20rkmqmkfkcvk2wl2lmzz7acq4svlr-python3-3.12.12/lib -L/nix/store/f2q5ld1nipl8w1r2w8m6azhlm2varqgb-zlib-1.3.1/lib -L/nix/store/87kd8nb5bws9x8r3k66hbcryr3xxvwxn-numactl-2.0.18/lib'
+NIX_LDFLAGS='-rpath /home/nasir/stuff/projects/school/4fp3/outputs/out/lib  -L/nix/store/vj3rmg6937p9icir6bazbdcb4xdnrg9j-ncurses-6.5/lib -L/nix/store/0aaj6jbxclpwvrphggqz4vf5hg8360fr-libffi-3.4.8/lib -L/nix/store/vaix9m2syrilm7hv3690plsk35y0arwm-elfutils-0.192/lib -L/nix/store/m9fycbkaairz8kampnsl7sx1aanvl0db-gmp-with-cxx-6.3.0/lib -L/nix/store/cvd68krxqrwgrsigszs0al2i8dnvlwk4-libxcrypt-4.4.38/lib -L/nix/store/yrgnr4naqdjwdhn1q142f8c5yb8jsz37-file-5.45/lib -L/nix/store/jd20rkmqmkfkcvk2wl2lmzz7acq4svlr-python3-3.12.12/lib -L/nix/store/f2q5ld1nipl8w1r2w8m6azhlm2varqgb-zlib-1.3.1/lib -L/nix/store/87kd8nb5bws9x8r3k66hbcryr3xxvwxn-numactl-2.0.18/lib -L/nix/store/vj3rmg6937p9icir6bazbdcb4xdnrg9j-ncurses-6.5/lib -L/nix/store/0aaj6jbxclpwvrphggqz4vf5hg8360fr-libffi-3.4.8/lib -L/nix/store/vaix9m2syrilm7hv3690plsk35y0arwm-elfutils-0.192/lib -L/nix/store/m9fycbkaairz8kampnsl7sx1aanvl0db-gmp-with-cxx-6.3.0/lib -L/nix/store/cvd68krxqrwgrsigszs0al2i8dnvlwk4-libxcrypt-4.4.38/lib -L/nix/store/yrgnr4naqdjwdhn1q142f8c5yb8jsz37-file-5.45/lib -L/nix/store/jd20rkmqmkfkcvk2wl2lmzz7acq4svlr-python3-3.12.12/lib -L/nix/store/f2q5ld1nipl8w1r2w8m6azhlm2varqgb-zlib-1.3.1/lib -L/nix/store/87kd8nb5bws9x8r3k66hbcryr3xxvwxn-numactl-2.0.18/lib'
 export NIX_LDFLAGS
 NIX_NO_SELF_RPATH='1'
 NIX_PKG_CONFIG_WRAPPER_TARGET_HOST_x86_64_unknown_linux_gnu='1'
@@ -165,7 +165,7 @@ declare -a envHostHostHooks=('pkgConfigWrapper_addPkgConfigPath' 'setupDebugInfo
 declare -a envHostTargetHooks=('pkgConfigWrapper_addPkgConfigPath' 'setupDebugInfoDirs' 'ccWrapper_addCVars' 'bintoolsWrapper_addLDVars' 'addAclocals' 'addPerlLibPath' 'addPythonPath' 'sysconfigdataHook' )
 declare -a envTargetTargetHooks=()
 declare -a fixupOutputHooks=('if [ -z "${dontPatchELF-}" ]; then patchELF "$prefix"; fi' 'if [[ -z "${noAuditTmpdir-}" && -e "$prefix" ]]; then auditTmpdir "$prefix"; fi' 'if [ -z "${dontGzipMan-}" ]; then compressManPages "$prefix"; fi' '_moveLib64' '_moveSbin' '_moveSystemdUserUnits' 'patchShebangsAuto' '_pruneLibtoolFiles' '_doStrip' )
-guess='24'
+guess='16'
 hardeningDisable='fortify'
 export hardeningDisable
 initialPath='/nix/store/zwplch93wbpj82bp7riwaixmdx2xi0ah-coreutils-9.7 /nix/store/c9jzm47zb8j7jbpw4a7zdm35qmhdf6ws-findutils-4.10.0 /nix/store/z059fc40f58cp2yflhbpfdg539x66b0g-diffutils-3.12 /nix/store/m0i5hf36sv62vgm2ppjkynv03ihdlxvv-gnused-4.9 /nix/store/90r466lzg0jw11v60cki60s0qfhs93vp-gnugrep-3.11 /nix/store/qvgw9scl3jjy1zsjipm3ngpcq472wj7w-gawk-5.3.2 /nix/store/76df6j9sq1ar58id3y3v4rkijany1wxp-gnutar-1.35 /nix/store/44c243x0jpv587hmxrzl31pripa0f0j8-gzip-1.14 /nix/store/59pgpbm743q1nhav513283zinqrf4rqk-bzip2-1.0.8-bin /nix/store/xpsgmdsqym0ydx6hkvpxrp6174s4fwbl-gnumake-4.4.1 /nix/store/l9k32vj2aczxw62134j1x0dsh569jz2l-bash-5.2p37 /nix/store/jangxddrzycnc2rl1wc1sqhqp26yrx4k-patch-2.7.6 /nix/store/b7g83isqdl778kmcpv6v68z76x4x5riv-xz-5.8.1-bin /nix/store/4zpfjm2r6chc8b10c1xa1d6asy100sqv-file-5.45'
@@ -175,7 +175,7 @@ name='ghc-shell-for-ghc-buildenv-9.8.4-0-env'
 export name
 nativeBuildInputs='/nix/store/xjsg1lm52b01v6k1v1169nlwpa2ing74-ghc-9.8.4 /nix/store/915h7anqmflnda4rph0payk93kmbk65n-happy-2.0.2 /nix/store/fpc23jaq9mc5899dpazyn08dv8y5a7i7-alex-3.5.3.0 /nix/store/b187xy5q13lcrfpylw5r6vpk97h447x6-cabal-install-3.14.2.0 /nix/store/7z8ynfqxkhy1z832xmzl86bgnc2jfkxf-configure_ghc /nix/store/n9hv0mj45zm0gzci4psnfypy2300dr5b-validate_ghc /nix/store/h5rj7l2nxnhwz88jj5ljkpr1dz3x0p0f-pkg-config-wrapper-0.29.2'
 export nativeBuildInputs
-out='/home/nasir/stuff/projects/4fp3/outputs/out'
+out='/home/nasir/stuff/projects/school/4fp3/outputs/out'
 export out
 outputBin='out'
 outputDev='out'
@@ -204,7 +204,7 @@ declare -a postUnpackHooks=('_updateSourceDateEpochFromSourceRoot' )
 declare -a preConfigureHooks=('_multioutConfig' )
 preConfigurePhases=' updateAutotoolsGnuConfigScriptsPhase'
 declare -a preFixupHooks=('_moveToShare' '_multioutDocs' '_multioutDevs' )
-prefix='/home/nasir/stuff/projects/4fp3/outputs/out'
+prefix='/home/nasir/stuff/projects/school/4fp3/outputs/out'
 declare -a propagatedBuildDepFiles=('propagated-build-build-deps' 'propagated-native-build-inputs' 'propagated-build-target-deps' )
 propagatedBuildInputs=''
 export propagatedBuildInputs

@@ -15,6 +15,9 @@
         withIde = true;
         version = "9.8.4";
         bootghc = "ghc98";
+        # nativeBuildInputs = pkgs: [
+        #   pkgs.zip
+        # ];
       };
     in
     {

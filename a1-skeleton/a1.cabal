@@ -14,6 +14,9 @@ library
         A1.Numeric
         A1.Polynomial
         A1.Symbolic
+        A1.B1
+        A1.B2
+        A1.B3
     build-depends:
         base ^>=4.19.2.0
     hs-source-dirs: src

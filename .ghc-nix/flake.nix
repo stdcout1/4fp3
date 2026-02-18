@@ -21,6 +21,37 @@
       };
     in
     {
-      devShells = ghc-nix.lib.perSystem (system: { default = ghc-nix.legacy ({ inherit system; } // userSettings); });
+      devShells = ghc-nix.lib.perSystem (system:
+        let
+          base = ghc-nix.legacy ({ inherit system; } // userSettings);
+
+          # ✅ use ghc.nix’s pinned nixpkgs
+          pkgs = import ghc-nix.inputs.nixpkgs { inherit system; };
+        in
+        {
+          default = pkgs.mkShell {
+            inputsFrom = [ base ];
+
+            packages = with pkgs; [
+              mesa
+              libGL
+              libGLU 
+              freeglut
+              xorg.libX11
+              xorg.libXi
+              xorg.libXrandr
+              xorg.libXxf86vm
+              xorg.libXcursor
+              xorg.libXinerama
+
+              # commonly needed extras
+              xorg.libXext
+              xorg.libXrender
+              xorg.libXfixes
+              xorg.libXau
+              xorg.libXdmcp
+            ];
+          };
+        });
     };
 }

@@ -1,0 +1,4 @@
+packages:
+    a3.cabal
+        
+tests: True

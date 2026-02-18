@@ -1,0 +1,9 @@
+cradle:
+  cabal:
+    - path: "src"
+      component: "lib:a3"
+
+    - path: "test"
+      component: "a3:test:solution-test"
+
+      

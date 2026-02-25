@@ -121,7 +121,8 @@ instance (Rename a, Rename b, Rename c) => Rename (a, b, c) where
     freeVars (a, b, c) = Set.union (Set.union (freeVars a) ( freeVars b)) (freeVars c)
 
 instance (Rename a, Rename b) => Rename (Either a b) where
-    rename e p = fmap (`rename` p) e
+    rename (Left a) p = Left (rename a p)
+    rename (Right b) p = Right (rename b p)
     freeVars (Left a) = freeVars a
     freeVars (Right b) = freeVars b
 
@@ -136,9 +137,10 @@ instance Rename Name where
     freeVars = Set.singleton
 
 instance (Rename a) => Rename (Binder ann a) where
-    -- we rename the binding varible 
+    -- we rename the binding varible and the body  
     rename (Binder n ann a) p = Binder (rename n p) ann (rename a p) 
-    freeVars (Binder n _ a) = Set.delete n (freeVars a) 
+    -- remove the freevar from name 
+    freeVars (Binder n _ a) = Set.difference (freeVars a) (freeVars n) 
 
 instance Rename Term where
     -- recursivly rename

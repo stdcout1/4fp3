@@ -37,7 +37,11 @@ newtype Name =
 -- Laws:
 -- > Set.notMember (freshen x nms) nms
 freshen :: String -> Set Name -> Name
-freshen x avoid = UnsafeName {getName= x ++ show(size avoid)}
+freshen x avoid =
+  let y = UnsafeName { getName = x ++ "0" }
+  in if Set.member y avoid
+       then freshen (getName y) avoid
+       else y
 
 -- $binders
 -- * Binders
@@ -133,8 +137,8 @@ instance Rename Name where
 
 instance (Rename a) => Rename (Binder ann a) where
     -- we rename the binding varible 
-    rename (Binder n ann a) p = Binder n ann (rename a p) 
-    freeVars (Binder n _ _) = Set.singleton n 
+    rename (Binder n ann a) p = Binder (rename n p) ann (rename a p) 
+    freeVars (Binder n _ a) = Set.delete n (freeVars a) 
 
 instance Rename Term where
     -- recursivly rename
@@ -152,7 +156,7 @@ instance Rename Term where
 
     -- recursivly find the freeVars and merge themp up
     freeVars (Var n) = freeVars n 
-    freeVars (Lam binder ) = freeVars binder
+    freeVars (Lam (Binder var typ trm) ) = Set.delete var (freeVars trm)
     freeVars (App t1 t2) = Set.union (freeVars t1 ) (freeVars t2 )
     freeVars Top = mempty
     freeVars Bot = mempty

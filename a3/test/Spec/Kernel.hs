@@ -49,6 +49,10 @@ typecheckSpec =
     in assertChecks Ctx.empty (lam "x" \x -> lam "y" \_ -> chk (var x)) (Fn Prop (Fn Prop Prop))
       (Lam (Binder x Prop (Lam (Binder y Prop (Var x)))))
   -- More tests here!
+  , testCase "exists" $ 
+    let x = freshen "x" Set.empty
+        y = freshen "y" Set.empty
+    in assertChecks Ctx.empty (exists "x" Prop (\x -> exists "y" Prop \_ -> chk (var x) ) ) Prop (Exists (Binder x Prop (Exists (Binder y Prop (Var x)))))
   ]
 
 -- * Proof tests

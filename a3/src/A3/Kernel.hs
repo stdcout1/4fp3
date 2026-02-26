@@ -100,10 +100,15 @@ var x = Infer \ctx ->
     Nothing -> Left (VariableNotInScope ctx x)
 
 chk :: Infer -> Check
-chk = _chk
+chk e = Check \ctx typ -> do 
+    (term, typ') <- runInfer e ctx  
+    if typ' == typ then pure term else Left (CheckMismatch "check" ctx typ)
 
 ann :: Check -> Type -> Infer
-ann = _ann
+ann e alpha = Infer \ctx -> do 
+    checked <- runCheck e ctx alpha 
+    pure (checked, alpha)
+    
 
 -- $functions
 -- ** Functions
@@ -131,22 +136,51 @@ app fnRule argRule = Infer \ctx -> do
 -- ** Propositions
 
 top :: Check
-top = _top
+top = Check \_ _ -> pure Top
 
 bot :: Check
-bot = _bot
+bot = Check \_ _ -> pure Bot
 
 and :: Check -> Check -> Check
-and = _and
+and lhs rhs = Check \ctx typ -> 
+    case typ of 
+        Prop -> do 
+            lhs' <- runCheck lhs ctx typ 
+            rhs' <- runCheck rhs ctx typ 
+            pure (And lhs' rhs')
+        _ -> Left (CheckMismatch "and" ctx typ)
+            
+
 
 or :: Check -> Check -> Check
-or = _or
+or lhs rhs = Check \ctx typ -> 
+    case typ of 
+        Prop -> do 
+            lhs' <- runCheck lhs ctx typ 
+            rhs' <- runCheck rhs ctx typ 
+            pure (Or lhs' rhs')
+        _ -> Left (CheckMismatch "or" ctx typ)
 
 implies :: Check -> Check -> Check
-implies = _implies
+implies lhs rhs = Check \ctx typ -> 
+    case typ of 
+        Prop -> do 
+            lhs' <- runCheck lhs ctx typ 
+            rhs' <- runCheck rhs ctx typ 
+            pure (Implies lhs' rhs')
+        _ -> Left (CheckMismatch "implies" ctx typ)
 
 exists :: String -> Type -> (Name -> Check) -> Check
-exists = _exists
+exists x typ bodyRule = Check \ctx prop -> 
+    case (prop, typ) of 
+        (Prop, Prop) -> do
+            let (nm, ctx') = Ctx.extend ctx x prop 
+            --ensure freshnes
+            term <- runCheck (bodyRule nm) ctx' prop
+            pure (Exists (Binder nm prop term))
+            -- we need a fresh name
+        _ -> Left (CheckMismatch "exists" ctx prop)
+    
 
 forAll :: String -> Type -> (Name -> Check) -> Check
 forAll = _forAll

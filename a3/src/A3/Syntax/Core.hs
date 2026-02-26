@@ -121,6 +121,8 @@ instance (Rename a, Rename b, Rename c) => Rename (a, b, c) where
     freeVars (a, b, c) = Set.union (Set.union (freeVars a) ( freeVars b)) (freeVars c)
 
 instance (Rename a, Rename b) => Rename (Either a b) where
+    -- rename e p = fmap (`rename` p) e
+    -- instresting that above dosnt work... 
     rename (Left a) p = Left (rename a p)
     rename (Right b) p = Right (rename b p)
     freeVars (Left a) = freeVars a
@@ -158,7 +160,7 @@ instance Rename Term where
 
     -- recursivly find the freeVars and merge themp up
     freeVars (Var n) = freeVars n 
-    freeVars (Lam (Binder var typ trm) ) = Set.delete var (freeVars trm)
+    freeVars (Lam binder ) = freeVars binder 
     freeVars (App t1 t2) = Set.union (freeVars t1 ) (freeVars t2 )
     freeVars Top = mempty
     freeVars Bot = mempty

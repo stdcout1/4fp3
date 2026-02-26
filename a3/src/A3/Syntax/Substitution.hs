@@ -20,6 +20,7 @@ import Data.Map qualified as Map
 
 import Data.Set (Set)
 import Data.Set qualified as Set
+import A3.Permutation (swap)
 
 newtype Substitution = Substitution { unSubstitution :: Map Name Term }
   deriving (Show, Eq)
@@ -84,7 +85,32 @@ class (Rename a) => Substitute a where
   subst a nm tm = substs a (single nm tm)
 
 instance (Substitute a, Substitute b) => Substitute (a, b) where
+    -- just map over both
+    -- substs t s = fmap (`substs` s) t
+    substs (a, b) s = (substs a s, substs b s)
 
 instance (Substitute a) => Substitute (Binder ann a) where
+    -- use freshen to pick a new binder name (name). 
+    -- it should not be in freeVar (s) and freeVar(ann).
+    -- swap all old binder names with new one 
+    -- return the new binder while substitiing into a. 
+    substs (Binder n ann a) s = 
+        let 
+            newName = freshen (getName n) (Set.union (freeVars s) (freeVars a))
+            newA = rename a (swap n newName)
+        in Binder newName ann (substs newA s) 
 
 instance Substitute Term where
+    -- if there is a mapping to a term then replace it else dont change it. 
+    substs (Var n) (Substitution s) = Map.findWithDefault (Var n) n s
+    -- substitie under the lambda, keep in the mind the binder above...
+    substs (Lam binder) s = Lam (substs binder s) 
+    substs (App t1 t2) s = App (substs t1 s) (substs t2 s)
+    substs Top s = Top 
+    substs Bot s = Bot  
+    substs (And t1 t2) s = And (substs t1 s) (substs t2 s)
+    substs (Or t1 t2) s = Or (substs t1 s) (substs t2 s)
+    substs (Implies t1 t2) s = Implies (substs t1 s) (substs t2 s)
+    substs (ForAll binder) s = ForAll (substs binder s) 
+    substs (Exists binder) s = Exists (substs binder s) 
+    substs (Eq t1 t2 ty) s = Eq (substs t1 s) (substs t2 s) ty

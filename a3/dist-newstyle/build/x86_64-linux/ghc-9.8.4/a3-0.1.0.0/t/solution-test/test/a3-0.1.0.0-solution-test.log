@@ -1,3 +1,3 @@
 Test suite solution-test: RUNNING...
-Test suite solution-test: PASS
-Test suite logged to: /home/nasir/stuff/projects/school/4fp3/a3/./dist-newstyle/build/x86_64-linux/ghc-9.8.4/a3-0.1.0.0/t/solution-test/test/a3-0.1.0.0-solution-test.log
+Test suite solution-test: FAIL
+Test suite logged to: /home/nasir/stuff/projects/4fp3/a3/./dist-newstyle/build/x86_64-linux/ghc-9.8.4/a3-0.1.0.0/t/solution-test/test/a3-0.1.0.0-solution-test.log

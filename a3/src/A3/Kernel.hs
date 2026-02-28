@@ -136,10 +136,16 @@ app fnRule argRule = Infer \ctx -> do
 -- ** Propositions
 
 top :: Check
-top = Check \_ _ -> pure Top
+top = Check \ctx goal ->
+    case goal of 
+        Prop -> pure Top
+        _ -> Left (CheckMismatch "top" ctx goal)
 
 bot :: Check
-bot = Check \_ _ -> pure Bot
+bot = Check \ctx goal -> 
+    case goal of 
+        Prop -> pure Bot
+        _ -> Left (CheckMismatch "bot" ctx goal)
 
 and :: Check -> Check -> Check
 and lhs rhs = Check \ctx typ -> 
@@ -171,23 +177,36 @@ implies lhs rhs = Check \ctx typ ->
         _ -> Left (CheckMismatch "implies" ctx typ)
 
 exists :: String -> Type -> (Name -> Check) -> Check
-exists x typ bodyRule = Check \ctx prop -> 
-    case (prop, typ) of 
-        (Prop, Prop) -> do
-            let (nm, ctx') = Ctx.extend ctx x prop 
+exists x typ bodyRule = Check \ctx res -> 
+    case res of 
+        Prop -> do
+            let (nm, ctx') = Ctx.extend ctx x typ 
             --ensure freshnes
-            term <- runCheck (bodyRule nm) ctx' prop
-            pure (Exists (Binder nm prop term))
+            term <- runCheck (bodyRule nm) ctx' res
+            pure (Exists (Binder nm typ term))
             -- we need a fresh name
-        _ -> Left (CheckMismatch "exists" ctx prop)
+        _ -> Left (CheckMismatch "exists" ctx res)
     
 
 forAll :: String -> Type -> (Name -> Check) -> Check
-forAll = _forAll
+forAll x typ bodyRule = Check \ctx res -> 
+    case res of 
+        Prop -> do
+            let (nm, ctx') = Ctx.extend ctx x typ 
+            --ensure freshnes
+            term <- runCheck (bodyRule nm) ctx' res
+            pure (ForAll (Binder nm typ term))
+            -- we need a fresh name
+        _ -> Left (CheckMismatch "forall" ctx res)
 
 eq :: Infer -> Check -> Check
-eq = _eq
-
+eq lhs rhs = Check \ctx res -> 
+    case res of 
+        Prop -> do 
+            (lhs', tlhs) <- runInfer lhs ctx
+            rhs' <- runCheck rhs ctx tlhs
+            pure (Eq lhs' rhs' Prop)
+        _ -> Left (CheckMismatch "forall" ctx res)
 -- $theorem
 -- * Theorems
 
@@ -235,70 +254,166 @@ hint bwdRule propRule  = Forward \ctx hyps -> do
 -- ** True
 
 topIntro :: Backward
-topIntro = _topIntro
+topIntro = Backward \ctx hyps goal -> 
+    if goal == Top then pure () else Left (IntroMismatch "top-intro" ctx hyps goal)
 
 -- $false
 -- ** False
 
 botElim :: Backward -> Backward
-botElim = _botElim
+botElim victim = Backward \ctx hyps _ -> do 
+    runBackward victim ctx hyps Bot 
+    pure ()
 
 -- $and
 -- ** Conjunctions
 
 -- | Introduction rule for and.
 andIntro :: Backward -> Backward -> Backward
-andIntro = _andIntro
+andIntro lhs rhs = Backward \ctx hyps goal ->
+    case goal of 
+        And lhs' rhs' -> do 
+            runBackward lhs ctx hyps lhs' 
+            runBackward rhs ctx hyps rhs'  
+            pure ()
+        _ -> Left $ IntroMismatch "and-intro" ctx hyps goal
 
 -- | Deduce @p@ from @p `and` q@.
 andElimLeft :: Forward -> Forward
-andElimLeft = _andElimLeft
+andElimLeft frule = Forward \ctx hyps -> do 
+    term <- runForward frule ctx hyps
+    case term of 
+        And lhs rhs -> pure lhs
+        _ -> Left $ ElimMismatch "add-elim-mismatch" ctx hyps "and" term 
 
 -- | Deduce @q@ from @p `and` q@.
 andElimRight :: Forward -> Forward
-andElimRight = _andElimRight
+andElimRight frule = Forward \ctx hyps -> do 
+    term <- runForward frule ctx hyps
+    case term of 
+        And lhs rhs -> pure rhs
+        _ -> Left $ ElimMismatch "add-elim-mismatch" ctx hyps "and" term 
 
 -- $or
 -- ** Disjunctions
 
 orIntroLeft :: Backward -> Backward
-orIntroLeft = _orIntroLeft
+orIntroLeft brule = Backward \ctx hyps goal -> 
+    case goal of 
+        Or lhs _ -> do
+            runBackward brule ctx hyps lhs 
+            pure ()
+        _ -> Left $ IntroMismatch "or-intro" ctx hyps goal 
+
 
 orIntroRight :: Backward -> Backward
-orIntroRight = _orIntroRight
+orIntroRight brule = Backward \ctx hyps goal -> 
+    case goal of 
+        Or _ rhs -> do
+            runBackward brule ctx hyps rhs 
+            pure ()
+        _ -> Left $ IntroMismatch "or-intro" ctx hyps goal 
 
 orElim :: Forward -> String -> (Name -> Forward) -> String -> (Name -> Backward) -> Forward
-orElim = _orElim
+orElim fRule p1 fRule1 p2 bRule2 = Forward \ctx hyps -> do
+  term <- runForward fRule ctx hyps
+  case term of
+    Or lhs rhs -> do
+      -- assume lhs, infer trident 
+      let (p1', hyps1) = Ctx.extend hyps p1 lhs
+      psi <- runForward (fRule1 p1') ctx hyps1
+
+      -- assume rhs, check the trident 
+      let (p2', hyps2) = Ctx.extend hyps p2 rhs
+      runBackward (bRule2 p2') ctx hyps2 psi
+
+      --cases... 
+      pure psi
+
+    _ -> Left $ ElimMismatch "or-elim" ctx hyps "or" term
 
 -- $implies
 -- ** Implication
 
 impliesIntro :: String -> (Name -> Backward) -> Backward
-impliesIntro = _impliesIntro
+impliesIntro name bRule = Backward \ctx hyps goal ->
+    case goal of 
+        Implies lhs rhs -> do 
+            let (n, hyps') = Ctx.extend hyps name lhs
+            runBackward (bRule n) ctx hyps' rhs
+        _ -> Left $ IntroMismatch "or-intro" ctx hyps goal 
+    
 
 -- | Elimination rule for 'Implies'.
 --
 -- Use @p `implies` q@ and @p@ to deduce @q@.
 impliesElim :: Forward -> Backward -> Forward
-impliesElim = _impliesElim
+impliesElim full precendent = Forward \ctx hyps -> do 
+    term <- runForward full ctx hyps
+    case term of 
+        Implies lhs rhs -> do
+            runBackward precendent ctx hyps lhs
+            pure rhs
+        _ -> Left $ ElimMismatch "implies-elim" ctx hyps "implies" term 
+        
+
 
 -- $exists
 -- ** Existentials
 
 existsIntro :: Check -> Backward -> Backward
-existsIntro = _existsIntro
+existsIntro t brule = Backward \ctx hyps goal -> 
+    case goal of 
+        Exists (Binder name an a) -> do 
+            x <- runCheck t ctx an
+            let sub = subst a name x
+            runBackward brule ctx hyps sub 
+            pure ()
+        _ -> Left $ IntroMismatch "exists intro" ctx hyps goal
 
 existsElim :: Forward -> String -> String -> (Name -> Name -> Backward) -> Backward
-existsElim = _existsElim
+existsElim fRule y p bRule = Backward \ctx hyps goal -> do 
+    term <- runForward fRule ctx hyps 
+    case term of 
+        Exists (Binder name an a) -> do
+            -- extend the conteexts..
+            let (y', ctx') = Ctx.extend ctx y an 
+                -- x <-> y
+                renamedphi = rename a (P.swap name y')
+                (p', hyps') = Ctx.extend hyps p renamedphi
+                in
+                runBackward (bRule y' p') ctx' hyps' renamedphi 
+        _ -> Left $ ElimMismatch "exists-elim" ctx hyps "exists" term 
+    
 
 -- $forall
 -- ** Universals
 
 forAllIntro :: String -> (Name -> Backward) -> Backward
-forAllIntro = _forAllIntro
+forAllIntro n bRule = Backward \ctx hyps goal ->
+  case goal of
+    ForAll (Binder x an phi) -> do
+      -- pick a fresh variable x' : an in the typing context 
+      let (x', ctx') = Ctx.extend ctx n an
+
+      -- alpha-rename the body from x to x'
+      let phi' = rename phi (P.swap x x')
+
+      -- now prove the renamed body under the extended 
+      runBackward (bRule x') ctx' hyps phi'
+      pure ()
+
+    _ -> Left $ IntroMismatch "forall-intro" ctx hyps goal
 
 forAllElim :: Forward -> Check -> Forward
-forAllElim = _forAllElim
+forAllElim fRule eRule = Forward \ctx hyps -> do
+  term <- runForward fRule ctx hyps
+  case term of
+    ForAll (Binder x an phi) -> do
+      e <- runCheck eRule ctx an
+      pure (subst phi x e)
+
+    _ -> Left $ ElimMismatch "forall-elim" ctx hyps "forall" term
 
 -- $equality
 -- ** Equality

@@ -135,6 +135,8 @@ app fnRule argRule = Infer \ctx -> do
 -- $propositions
 -- ** Propositions
 
+-- alot of it follows from others so i left comments on things 
+-- that made me think alot
 top :: Check
 top = Check \ctx goal ->
     case goal of 
@@ -393,13 +395,12 @@ forAllIntro :: String -> (Name -> Backward) -> Backward
 forAllIntro n bRule = Backward \ctx hyps goal ->
   case goal of
     ForAll (Binder x an phi) -> do
-      -- pick a fresh variable x' : an in the typing context 
+      --pick
       let (x', ctx') = Ctx.extend ctx n an
 
       -- alpha-rename the body from x to x'
       let phi' = rename phi (P.swap x x')
 
-      -- now prove the renamed body under the extended 
       runBackward (bRule x') ctx' hyps phi'
       pure ()
 

@@ -1,0 +1,50 @@
+cabal-version:      3.0
+name:               a4
+version:            0.1.0.0
+license:            NONE
+build-type:         Simple
+
+common ghc-options
+    ghc-options: -Wall -fdefer-typed-holes -O2
+
+common language
+    default-language: Haskell2010
+    default-extensions:
+        BangPatterns,
+        ImportQualifiedPost,
+        TypeApplications,
+        StrictData
+
+library
+    import:           ghc-options, language
+    hs-source-dirs:   src
+    exposed-modules:  Huffman,
+                      PriorityQueue,
+                      CharMap
+    build-depends:    base ^>=4.19.2.0,
+                      containers >= 0.7
+
+executable a4-dna
+  import:           ghc-options, language
+  main-is:          Main.hs
+  hs-source-dirs:   app
+  build-depends:    base ^>=4.19.2.0,
+                    a4
+
+test-suite a4-test
+    import:           ghc-options, language
+    hs-source-dirs:   test
+    type:             exitcode-stdio-1.0
+    main-is:          Main.hs
+    other-modules:    Spec.PriorityQueue,
+                      Spec.Huffman,
+                      Spec.CharMap
+    build-depends:
+        base ^>=4.19.2.0,
+        containers >= 0.7,
+        tasty >= 1.5,
+        tasty-hunit >= 0.10,
+        tasty-hedgehog >= 1.4,
+        hedgehog >= 1.7,
+        a4
+

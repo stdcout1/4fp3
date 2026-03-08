@@ -16,8 +16,7 @@ th2 a = [| $a + 57 |] -- splce. take the ast of a and insert
 
 -- try pp $ th2 th1
 
-
-
 -- we need to keep track of operational semantics and the algerbra to allow us 
 -- to make simplfications in the complication step
+
 

@@ -94,7 +94,7 @@ insertWith f xk xv m =
             else if xk > yk then balance c l yk yv (ins r)
             else -- duplicate 
                 balance c l yk (f xv yv) r
-        Node _ l yk yv r = ins m 
+        Node _ l yk yv r = ins m -- we know this cant be empty as ins dosent return empty...
     in Node B l yk yv r
 
 -- | Insert a key-value pair into the map, overwriting values if the key already
@@ -107,8 +107,8 @@ lookup :: Char -> CharMap a -> Maybe a
 lookup _ Empty = Nothing
 lookup yk (Node _ l xk xv r) =
     -- just recurse down 
-    if xk < yk then lookup yk l
-    else if xk < yk then lookup yk r
+    if yk < xk then lookup yk l
+    else if yk > xk then lookup yk r
     else Just xv
 
 -- | /Strict/ left fold over key-value pairs. \(O(A)\).
@@ -135,4 +135,8 @@ fromList = foldl' (\m (k, v) -> insert k v m) empty
 -- \(O(A)\). Avoids \(O(A^2)\) concatenations by building the list
 -- right-to-left.
 toAscList :: CharMap a -> [(Char, a)]
-toAscList = _toAscList 
+toAscList m = reverse $ foldlWithKey' (\acc k v -> (k, v) : acc ) [] m 
+-- just add (k,v) in l-r order O(A)
+-- reverse O(A)
+
+

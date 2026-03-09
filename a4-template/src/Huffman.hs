@@ -36,7 +36,9 @@ instance Ord Tree where
 
 -- | Count character occurrences using a strict left fold. \(O(N\log{}(A))\).
 frequencies :: String -> CharFrequencies
-frequencies = _frequencies -- Hint: foldl' with insertWith
+frequencies = foldl (\m c -> M.insertWith (+) c 1 m ) M.empty
+-- take the old value and plus one
+-- or set as one
 
 -- | Construct a Huffman tree from an input string. \(O(N\log{}(A))\).
 buildTree :: String -> Maybe Tree
@@ -46,7 +48,25 @@ buildTree = buildHuffman . frequencies
 -- frequency table. \(O(A\log{}(A))\). Handles the A=1 edge case by inserting a
 -- dummy '\0' leaf.
 buildHuffman :: CharFrequencies -> Maybe Tree
-buildHuffman = _buildHuffman -- Use a PQ to combine trees until one remains
+buildHuffman f = 
+    let 
+        -- setup a pq with nodes as a number and a leag tagged char
+        pQ = M.foldlWithKey' (\pq c n -> PQ.insert (Leaf c n) pq) PQ.empty f 
+        -- then we pop from it until there is nothing and add it as a branch in our tree 
+        -- we made a node with the children and add it 
+        -- the min PQ will prio shortest tree until 
+        -- we have one tree left which is exactly the huffman 
+        -- tree!
+        popper pq = do 
+            (l, pq') <-PQ.popMin pq 
+            case PQ.popMin pq' of 
+                Nothing -> Just l
+                Just (l', pq'') ->
+                    let w = weight l + weight l'
+                    in popper (PQ.insert (Node w l l') pq'')
+    in
+        popper pQ
+    
 
 -- | Generate a Huffman code table from a Huffman tree. \(O(A\log{}(A))\).
 codeTable :: Tree -> Table

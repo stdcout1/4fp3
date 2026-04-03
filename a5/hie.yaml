@@ -1,0 +1,10 @@
+cradle:
+  cabal:
+    - path: "app/Main.hs"
+      component: "a5:exe:a5"
+
+    - path: "src"
+      component: "lib:a5"
+
+    - path: "test"
+      component: "a5:test:a5-test"

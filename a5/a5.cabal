@@ -1,0 +1,64 @@
+cabal-version:      3.4
+name:               a5
+version:            0.1.0.0
+-- synopsis:
+-- description:
+license:            NONE
+author:             Reed Mullanix
+maintainer:         mullanir@mcmaster.ca
+-- copyright:
+build-type:         Simple
+extra-doc-files:    CHANGELOG.md
+-- extra-source-files:
+
+common warnings
+  ghc-options: -Wall -fdefer-typed-holes
+
+common extensions
+  default-extensions:
+    BangPatterns
+    BlockArguments
+    ImportQualifiedPost
+    OverloadedStrings
+    ScopedTypeVariables
+    TypeApplications
+  
+library
+  import: warnings, extensions
+  build-depends:
+      base >=4.19.2.0,
+      containers >= 0.7,
+      vector >= 0.12,
+  hs-source-dirs: src
+  exposed-modules:
+    A5.Data.Array.Pure
+    A5.Compile
+    A5.Eval.Partial
+    A5.Eval.Pure
+    A5.Language
+    A5.Language.Notation
+    A5.Language.Ring
+    A5.Poly.Sparse
+
+test-suite a5-test
+    import: warnings, extensions
+    other-modules:
+    build-depends:
+        base >=4.19.2.0,
+        containers >= 0.7,
+        tasty >= 1.5,
+        tasty-hunit >= 0.10,
+        tasty-hedgehog >= 1.4,
+        hedgehog >= 1.5,
+        vector >= 0.12,
+        a5
+    default-language: Haskell2010
+    type: exitcode-stdio-1.0
+    hs-source-dirs: test
+    main-is: Main.hs
+    other-modules:
+      Spec.Eval.Partial
+      Spec.Eval.Pure
+      Spec.Programs
+      Spec.Compile
+      Spec.Poly.Sparse

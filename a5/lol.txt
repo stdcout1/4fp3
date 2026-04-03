@@ -1,1 +1,0 @@
-'<,'>s/\(\w.*\) =.*/interpretStep (BinOp \u\1 l r) look = \1 (interpretExpr l look) (interpretExpr r look)
